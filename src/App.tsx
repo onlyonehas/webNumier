@@ -1,23 +1,36 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import styled from "styled-components";
+import "./App.css";
+
+const TextArea = styled.textarea`
+  width: 50%;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  background-color: #212225;
+  border: none;
+  height: 100px;
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 18px;
+`;
+
+const Divider = styled.div`
+  width: 20px;
+`;
+
+const Wrapper = styled.div`
+  width: 100%;
+  background-color: #212225;
+`;
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <p>Getting started.</p>
+        <Wrapper>
+          <TextArea></TextArea>
+          <Divider> </Divider>
+        </Wrapper>
       </header>
     </div>
   );
