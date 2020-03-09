@@ -1,4 +1,4 @@
-# webNumier is Numi accessible everywhere  
+# webNumier - like Numi but more custom + accessible everywhere 
 I use Numi* alot, but want to access it everywhere plus would like to calculate my expense dynamically
 so giving this a go!
 
