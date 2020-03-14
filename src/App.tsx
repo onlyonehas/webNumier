@@ -1,17 +1,19 @@
-import React, { useState } from "react";
+import React, { Component } from "react";
 import styled from "styled-components";
 import "./App.css";
+import { elementToString } from "./helpers/htmlString";
 
-const TextArea = styled.textarea`
+const TextArea: any = styled.div`
   /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); */
   background-color: #212225;
   border: none;
   color: white;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 18px;
-  margin: 0px;
+  margin-left: 340px;
   width: 445px;
   height: 445px;
+  text-align: left;
 `;
 
 const Divider = styled.div`
@@ -23,56 +25,16 @@ const Wrapper = styled.div`
   background-color: #212225;
 `;
 
-const Headings = styled.span`
-  color: orange;
-`;
-
-const Answers = styled.p`
-  color: green;
-`;
+const Headings: string = `color: "orange"`;
+const Answers: string = `color: "green"`;
 
 const Keyword = styled.p`
   color: blue;
 `;
 
-const applyColour = () => (event: any) => {
-  // <Headings />;
-  console.log(event);
-};
-
-const analyseInput = (setText: Function) => (event: any) => {
-  let key = event.keyCode;
-  const textEntered = event.target.value;
-  const splitTextByLine = textEntered.split("\n");
-  let formattedText: string = "";
-  splitTextByLine.forEach((perWord: string) => {
-    let filterWord = perWord.split(":");
-    filterWord.forEach(perWord => {
-      let str = perWord.trim();
-      let strLength = str.length;
-      let firstCharacter = str.substring(0, 1);
-      let lastCharacter = str.substring(strLength - 1, strLength);
-      console.log(str);
-      console.log(firstCharacter);
-
-      if (firstCharacter === "#") {
-        formattedText += <Headings>str</Headings> + "\n";
-      } else {
-        formattedText += str + "\n";
-      }
-    });
-  });
-
-  console.log("formattedText", formattedText);
-  setText(formattedText);
-
-  if (key === 186 || key === 35) {
-    applyColour();
-  }
-};
-
-function App() {
-  const defaultText = `
+class App extends Component<any, any> {
+  private textInput = React.createRef<HTMLParagraphElement>();
+  private defaultText = `
   #Expenses 
   car: 441 //(01)
   british gas: 190 // or 200 
@@ -83,19 +45,107 @@ function App() {
   Total: sum  
   Result: 2300-prev
   `;
-  const [text, setText] = useState(defaultText);
 
-  return (
-    <div className="App">
-      <header className="App-header">
-        <p>Getting started.</p>
-        <Wrapper>
-          <TextArea defaultValue={text} onKeyUp={analyseInput(setText)} />
-          <Divider />
-        </Wrapper>
-      </header>
-    </div>
-  );
+  constructor(props: any) {
+    super(props);
+    this.state = { text: this.defaultText };
+    this.textInput = React.createRef();
+  }
+
+  applyColour = () => (event: any) => {
+    // <Headings />;
+    console.log(event);
+  };
+
+  analyseInput = (textInput: any, e: any) => {
+    const textEntered: any = textInput.current.innerHTML;
+    const splitTextByLine = textEntered.split("\n");
+    console.log(splitTextByLine);
+    let formattedText: string = "";
+    splitTextByLine.forEach((perLine: any) => {
+      let str = perLine.trim();
+      let strLength = str.length;
+      let firstCharacter = str.substring(0, 1);
+      let lastCharacter = str.substring(strLength - 1, strLength);
+      console.log({ firstCharacter, lastCharacter });
+
+      if (firstCharacter === "#") {
+        formattedText += elementToString("span", "color:orange;", str, true);
+      } else if (str.includes(":")) {
+        let findColon = str.indexOf(":") + 1;
+        let getColonedString = str.substring(0, findColon);
+
+        let getStringAfterColon = str.substring(findColon, strLength);
+        if (getStringAfterColon.includes("//")) {
+          let findComment = str.indexOf("//");
+          let getCommentedString = str.substring(findComment, strLength);
+          let getInBetweenColonAndCommented = str.substring(
+            findColon,
+            findComment
+          );
+
+          formattedText += elementToString(
+            "span",
+            "color:blue;",
+            getColonedString
+          );
+          formattedText += elementToString(
+            "span",
+            "color:white;",
+            getInBetweenColonAndCommented
+          );
+
+          formattedText += elementToString(
+            "span",
+            "color:grey;",
+            getCommentedString,
+            true
+          );
+        } else {
+          formattedText += elementToString(
+            "span",
+            "color:blue;",
+            getColonedString
+          );
+
+          formattedText += elementToString(
+            "span",
+            "color:white;",
+            getStringAfterColon,
+            true
+          );
+        }
+      } else {
+        formattedText += str;
+      }
+    });
+    textInput.current.innerHTML = formattedText;
+
+    // if (key === 186 || key === 35) {
+    //   applyColour();
+    // }
+  };
+
+  render() {
+    const text = this.state.text;
+    return (
+      <div className="App">
+        <header className="App-header">
+          <p>Getting started.</p>
+          <Wrapper>
+            <TextArea
+              ref={this.textInput}
+              contentEditable="true"
+              onKeyUp={(e: any) => this.analyseInput(this.textInput, e)}
+            >
+              {text}
+            </TextArea>
+            <Divider />
+          </Wrapper>
+        </header>
+      </div>
+    );
+  }
 }
 
 export default App;
