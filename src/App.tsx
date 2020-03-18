@@ -18,6 +18,7 @@ const TextArea: any = styled.div`
 
 const Divider = styled.div`
   width: 20px;
+  color: #8ace2d;
 `;
 
 const Wrapper = styled.div`
@@ -25,14 +26,15 @@ const Wrapper = styled.div`
   background-color: #212225;
 `;
 
-const HeadingsStyle: string = `color: "#e8b22f";`;
-const CommentsStyle: string = `color: "#4e4f56";`;
-const KeywordStyle: string = `color: "#6ac1eb";`;
-const NumbersStyle: string = `color: "#e2e6e8"`;
-const AnswersStyle: string = `color: "#8ace2d"`;
+const HeadingsStyle: string = `color: #e8b22f`;
+const CommentsStyle: string = `color: #4e4f56`;
+const KeywordStyle: string = `color: #6ac1eb`;
+const NumbersStyle: string = `color: #e2e6e8`;
+const AnswersStyle: string = `color: #8ace2d`;
 
 class App extends Component<any, any> {
   private textInput = React.createRef<HTMLParagraphElement>();
+  private divider = React.createRef<HTMLParagraphElement>();
   private defaultText = `
   #Expenses 
   car: 441 //(01)
@@ -56,6 +58,7 @@ class App extends Component<any, any> {
       lineNumber: 0
     };
     this.textInput = React.createRef();
+    this.divider = React.createRef();
   }
 
   // TODO - REFACTOR CODE LOTS OF REPETITION
@@ -145,12 +148,13 @@ class App extends Component<any, any> {
 
     console.log({ enteredCharacter, enteredKey, prevCharacter });
     let formattedText: string = "";
+    console.log(this.hashTagMode, this.commentMode);
+    console.log(enteredKey);
 
     switch (enteredKey) {
       // hastag
-      case 51:
+      case 51 && prevCharacter !=  16:
         this.hashTagMode = true;
-
         formattedText += elementToString(
           "span",
           "hashtag" + curLineNum,
@@ -158,42 +162,71 @@ class App extends Component<any, any> {
           enteredCharacter
         );
         console.log(formattedText);
+        break;
+
       // colon
       case 186:
-        this.commentMode = true;
-
+        let findColon = textEntered.indexOf(":");
+        let getColonedString = textEntered.substring(0, findColon) + ":";
+        console.log(getColonedString);
         formattedText += elementToString(
           "span",
           "colon" + curLineNum,
           HeadingsStyle,
-          enteredCharacter
+          getColonedString
         );
+        textInput.current.innerHTML = formattedText;
+        break;
+
       // enter
       case 13:
         //TODO get word for that line
         this.setState({ lineNumber: curLineNum++ });
+        this.hashTagMode = false;
+        this.commentMode = false;
+        break;
+
       // comment
       case 191 && prevCharacter === 191:
+        this.commentMode = true;
         formattedText += elementToString(
           "span",
           "comment" + curLineNum,
           HeadingsStyle,
           enteredCharacter
         );
+        break;
+
       // ctrl + v
       case 86 && (prevCharacter === 91 || prevCharacter === 17):
         this.analyseInput(textInput, e);
+        break;
+
       // ctrl + a
       case 65 && (prevCharacter === 91 || prevCharacter === 17):
       // backspace
+      // TODO Determine the selected removed line
       case 8:
       default:
         // TODO Add letter in appropriate location
+        if (this.hashTagMode === true) {
+          let appendHashTag: any = document.getElementById(
+            "hashtag" + curLineNum
+          );
+          appendHashTag.innerText += enteredCharacter;
+        }
+
+        if (this.commentMode === true) {
+          let appendCommentText: any = document.getElementById(
+            "comment" + curLineNum
+          );
+          appendCommentText.innerText += enteredCharacter;
+        }
         break;
     }
     this.setState({ prevCharacter: enteredKey });
     console.log({ formattedText });
-    textInput.current.innerHTML = formattedText;
+    // textInput.current.innerHTML = formattedText;
   };
 
   render() {
@@ -206,11 +239,11 @@ class App extends Component<any, any> {
             <TextArea
               ref={this.textInput}
               contentEditable="true"
-              onKeyUp={(e: any) => this.analyseKeys(this.textInput, e)}
+              onKeyDown={(e: any) => this.analyseKeys(this.textInput, e)}
             >
               {text}
             </TextArea>
-            <Divider />
+            <Divider ref={this.divider} contentEditable="true" />
           </Wrapper>
         </header>
       </div>

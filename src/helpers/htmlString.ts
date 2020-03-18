@@ -3,5 +3,5 @@ export const elementToString = (elementName: string, id: string, css: string, te
     if (withBreak) {
         addBreaktag = "<br>"
     }
-    return `<${elementName} id=${id} style=${css}>${text}</${elementName}>${addBreaktag}`
+    return `<${elementName} id="${id}" style="${css};">${text}</${elementName}>${addBreaktag}`
 }
