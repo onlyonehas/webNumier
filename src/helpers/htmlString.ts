@@ -1,7 +1,7 @@
-export const elementToString = (elementName: string, css: string, text: string, withBreak?: boolean) => {
+export const elementToString = (elementName: string, id: string, css: string, text: string, withBreak?: boolean) => {
     let addBreaktag = '';
     if (withBreak) {
         addBreaktag = "<br>"
     }
-    return `<${elementName} style=${css}>${text}</${elementName}>${addBreaktag}`
+    return `<${elementName} id=${id} style=${css}>${text}</${elementName}>${addBreaktag}`
 }
